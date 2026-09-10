@@ -6,13 +6,14 @@ import pandas as pd
 import streamlit as st
 from PIL import Image
 
+
 # ============================================================
 # PATHS
 # ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent
-
 MODEL_PATH = BASE_DIR / "best.pt"
+
 
 # ============================================================
 # DEFECT CONFIGURATION
@@ -29,6 +30,7 @@ DEFECT_WEIGHTS = {
 
 EXPECTED_CLASSES = list(DEFECT_WEIGHTS.keys())
 
+
 # ============================================================
 # PAGE CONFIGURATION
 # ============================================================
@@ -38,6 +40,7 @@ st.set_page_config(
     page_icon="🔍",
     layout="wide",
 )
+
 
 # ============================================================
 # CUSTOM CSS
@@ -68,6 +71,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+
 # ============================================================
 # HEADER
 # ============================================================
@@ -82,6 +86,7 @@ st.caption(
     "AI detection → confidence → severity → quality analytics"
 )
 
+
 # ============================================================
 # MODEL LOADING
 # ============================================================
@@ -91,19 +96,17 @@ def load_model():
     """
     Load the trained YOLO model.
 
-    The model path is resolved relative to this app.py file,
-    so Streamlit can be launched from different directories.
+    best.pt must be located in the same folder
+    as this app.py file.
     """
 
     if not MODEL_PATH.exists():
-        st.error(
-            "❌ SteelGuard AI model was not found."
-        )
+        st.error("❌ SteelGuard AI model was not found.")
 
         st.code(str(MODEL_PATH))
 
         st.info(
-            "Make sure best.pt exists at the path shown above."
+            "Make sure best.pt exists in the same folder as app.py."
         )
 
         return None
@@ -135,9 +138,8 @@ def severity_score(
     """
     Calculate a prototype severity score.
 
-    NOTE:
-    This is a prototype business-rule score, not an
-    industrially validated quality standard.
+    This is a prototype business-rule score and is not
+    an industrially validated quality standard.
     """
 
     weight = DEFECT_WEIGHTS.get(
@@ -189,7 +191,6 @@ def predict(
     # --------------------------------------------------------
 
     image_rgb = image.convert("RGB")
-
     image_array = np.array(image_rgb)
 
     # --------------------------------------------------------
@@ -295,9 +296,10 @@ review_threshold = st.sidebar.slider(
 
 st.sidebar.divider()
 
-# ------------------------------------------------------------
-# Model status
-# ------------------------------------------------------------
+
+# ============================================================
+# MODEL STATUS
+# ============================================================
 
 if MODEL_PATH.exists():
 
@@ -315,6 +317,7 @@ st.sidebar.caption(
     f"Model: {MODEL_PATH.name}"
 )
 
+
 # ============================================================
 # TABS
 # ============================================================
@@ -326,6 +329,7 @@ tab1, tab2, tab3 = st.tabs(
         "⚙️ Model",
     ]
 )
+
 
 # ============================================================
 # INSPECTION TAB
@@ -366,14 +370,16 @@ with tab1:
             # Read uploaded image
             # ------------------------------------------------
 
-            image = Image.open(uploaded).convert("RGB")
+            image = Image.open(
+                uploaded
+            ).convert("RGB")
 
             # ------------------------------------------------
             # Display uploaded image information
             # ------------------------------------------------
 
             st.caption(
-                f"Image: {uploaded.name}  |  "
+                f"Image: {uploaded.name} | "
                 f"Resolution: {image.width} × {image.height}"
             )
 
@@ -409,8 +415,7 @@ with tab1:
             )
 
             latency_ms = (
-                time.perf_counter()
-                - start
+                time.perf_counter() - start
             ) * 1000
 
             # ------------------------------------------------
@@ -420,8 +425,7 @@ with tab1:
             detections = []
 
             img_area = (
-                image.width
-                * image.height
+                image.width * image.height
             )
 
             for detection in raw_detections:
@@ -441,23 +445,19 @@ with tab1:
                 )
 
                 box_area = (
-                    box_width
-                    * box_height
+                    box_width * box_height
                 )
 
                 area_ratio = (
-                    box_area
-                    / img_area
+                    box_area / img_area
                     if img_area > 0
                     else 0
                 )
 
-                score, severity = (
-                    severity_score(
-                        detection["confidence"],
-                        area_ratio,
-                        detection["type"],
-                    )
+                score, severity = severity_score(
+                    detection["confidence"],
+                    area_ratio,
+                    detection["type"],
                 )
 
                 # --------------------------------------------
@@ -520,7 +520,7 @@ with tab1:
                 st.image(
                     annotated,
                     caption="SteelGuard AI annotated inspection",
-                    use_container_width=True,
+                    width="stretch",
                 )
 
             # ------------------------------------------------
@@ -603,7 +603,7 @@ with tab1:
 
                 st.dataframe(
                     detection_df,
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True,
                 )
 
@@ -646,6 +646,11 @@ with tab2:
         "Production Quality Dashboard"
     )
 
+    st.caption(
+        "Prototype analytics for demonstration. "
+        "Production values require plant-specific validation."
+    )
+
     # --------------------------------------------------------
     # Prototype analytics data
     # --------------------------------------------------------
@@ -679,25 +684,23 @@ with tab2:
     c1, c2, c3, c4 = st.columns(4)
 
     c1.metric(
-        "Inspected length",
+        "Sample inspected length",
         "1,840 m",
     )
 
     c2.metric(
-        "Total defects",
-        int(
-            sample["Count"].sum()
-        ),
+        "Sample defects",
+        int(sample["Count"].sum()),
     )
 
     c3.metric(
-        "Critical defects",
+        "Sample critical defects",
         "7",
     )
 
     c4.metric(
         "False-alarm rate",
-        "3.2%",
+        "Not measured",
     )
 
     # --------------------------------------------------------
@@ -781,7 +784,7 @@ with tab2:
 
     st.dataframe(
         feedback,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -828,7 +831,7 @@ with tab3:
 
     st.write(
         "**Deployment:** "
-        "Ultralytics YOLO11 → PyTorch GPU inference"
+        "Ultralytics YOLO → PyTorch CPU inference"
     )
 
     # --------------------------------------------------------
