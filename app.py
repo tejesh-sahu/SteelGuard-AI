@@ -201,7 +201,7 @@ def predict(
         conf=confidence_threshold,
         device="cpu",
         verbose=False,
-)
+    )
 
     # --------------------------------------------------------
     # Get first result
