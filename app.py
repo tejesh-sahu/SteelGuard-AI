@@ -197,10 +197,10 @@ def predict(
     # --------------------------------------------------------
 
     results = model.predict(
-     source=image_array,
-     conf=confidence_threshold,
-     device="cpu",
-     verbose=False,
+        source=image_array,
+        conf=confidence_threshold,
+        device="cpu",
+        verbose=False,
 )
 
     # --------------------------------------------------------
