@@ -196,12 +196,12 @@ def predict(
     # Run YOLO inference
     # --------------------------------------------------------
 
-    results = model.predict(
-        source=image_array,
-        conf=confidence_threshold,
-        device=0,
-        verbose=False,
-    )
+   results = model.predict(
+    source=image_array,
+    conf=confidence_threshold,
+    device="cpu",
+    verbose=False,
+)
 
     # --------------------------------------------------------
     # Get first result
