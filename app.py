@@ -12,15 +12,7 @@ from PIL import Image
 
 BASE_DIR = Path(__file__).resolve().parent
 
-MODEL_PATH = (
-    BASE_DIR
-    / "runs"
-    / "detect"
-    / "runs"
-    / "steelguard-7"
-    / "weights"
-    / "best.pt"
-)
+MODEL_PATH = BASE_DIR / "best.pt"
 
 # ============================================================
 # DEFECT CONFIGURATION
